@@ -60,7 +60,20 @@
     mode: "{{ item.mode | default('0755') }}"
     state: "{{ item.state | default('directory') }}"
   loop:
-    - { dest: /etc/kubernetes/addons }
+    - { dest: /etc/kubernetes/charts }
+  when: inventory_hostname == ansible_play_hosts[0]
+
+- name: rsync directories
+  ansible.posix.synchronize:
+    dest: "{{ item.dest }}"
+    src: "{{ item.src | default('./files' + item.dest + '/') }}"
+    archive: true
+    delete: true
+    owner: false
+    group: false
+  loop:
+    - { dest: /etc/kubernetes/charts/metallb }
+  when: inventory_hostname == ansible_play_hosts[0]
 
 - name: copy templates
   ansible.builtin.template:
@@ -70,14 +83,14 @@
     group: "{{ item.group | default('root') }}"
     mode: "{{ item.mode | default('0644') }}"
   loop:
-    - { dest: /etc/kubernetes/addons/80-metallb.yml }
+    - { dest: /etc/kubernetes/charts/metallb.values.yaml }
+  when: inventory_hostname == ansible_play_hosts[0]
 
-- name: prepare files
-  ansible.builtin.file:
-    dest: "{{ item.dest }}"
-    owner: "{{ item.owner | default('root') }}"
-    group: "{{ item.group | default('root') }}"
-    mode: "{{ item.mode | default('0644') }}"
-    state: "{{ item.state | default('file') }}"
-  loop:
-    - { dest: /etc/kubernetes/addons/80-metallb.yml }
+- name: helm install
+  kubernetes.core.helm:
+    release_name: "{{ helm_metallb_helm_release_name }}"
+    release_namespace: "{{ helm_metallb_helm_release_namespace }}"
+    chart_ref: /etc/kubernetes/charts/metallb
+    values_files: /etc/kubernetes/charts/metallb.values.yaml
+    create_namespace: true
+  when: inventory_hostname == ansible_play_hosts[0]

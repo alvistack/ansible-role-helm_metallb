@@ -28,11 +28,119 @@
       ansible.builtin.shell:
         cmd: |
           set -euxo pipefail
-          kubectl get pod --all-namespaces | egrep -e 'metallb\s+controller-\S+\s+[0-9]+\/[0-9]+\s+Running'
+          kubectl get pod --all-namespaces | egrep -e 'metallb\s+metallb-controller-\S+\s+[0-9]+\/[0-9]+\s+Running'
       args:
         executable: /bin/bash
-      when: inventory_hostname == ansible_play_hosts[0]
+      when: inventory_hostname == groups['kube_master'][0]
       register: result
       changed_when: result is not succeeded
       until: result is succeeded
+      retries: 60
+
+    - name: create IPAddressPool
+      vars:
+        ansible_python_interpreter: python3
+      kubernetes.core.k8s:
+        state: present
+        wait: true
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          metadata:
+            name: first-pool
+            namespace: metallb
+          spec:
+            addresses:
+              - "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.prefix) | ansible.utils.ipsubnet(28, -1) }}"
+      when: inventory_hostname == groups['kube_master'][0]
+      register: result
+      until: result is succeeded
+      changed_when: result is not succeeded
+      retries: 60
+
+    - name: create L2Advertisement
+      vars:
+        ansible_python_interpreter: python3
+      kubernetes.core.k8s:
+        state: present
+        wait: true
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          metadata:
+            name: example
+            namespace: metallb
+          spec:
+            ipAddressPools:
+            - first-pool
+      when: inventory_hostname == groups['kube_master'][0]
+      register: result
+      until: result is succeeded
+      changed_when: result is not succeeded
+      retries: 60
+
+    - name: create pod
+      vars:
+        ansible_python_interpreter: python3
+      kubernetes.core.k8s:
+        state: present
+        wait: true
+        definition:
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: nginx
+            namespace: default
+            labels:
+              app: nginx
+          spec:
+            containers:
+              - name: nginx
+                image: docker.io/library/nginx:latest
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 80
+      when: inventory_hostname == groups['kube_master'][0]
+      register: result
+      until: result is succeeded
+      changed_when: result is not succeeded
+      retries: 60
+
+    - name: create service
+      vars:
+        ansible_python_interpreter: python3
+      kubernetes.core.k8s:
+        state: present
+        wait: true
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx
+            namespace: default
+          spec:
+            ports:
+              - name: nginx
+                port: 80
+                targetPort: 80
+            selector:
+              app: nginx
+            type: LoadBalancer
+      when: inventory_hostname == groups['kube_master'][0]
+      register: result
+      until: result is succeeded
+      changed_when: result is not succeeded
+      retries: 60
+
+    - name: kubectl describe svc
+      ansible.builtin.shell:
+        cmd: |
+          set -euxo pipefail
+          curl -skL http://$(kubectl -n default describe svc nginx | grep 'LoadBalancer Ingress' | sed 's/^.*:\s*\([0-9\.]*\).*$/\1/g'):80
+      args:
+        executable: /bin/bash
+      when: inventory_hostname == groups['kube_master'][0]
+      register: result
+      until: result is succeeded
+      changed_when: result is not succeeded
       retries: 60
