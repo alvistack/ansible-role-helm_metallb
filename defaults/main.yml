@@ -22,3 +22,22 @@ helm_metallb_helm_release_namespace: metallb
 
 # Value to pass to chart.
 helm_metallb_helm_release_values:
+  rbac:
+    create: true
+  prometheus:
+    rbacProxy:
+      pullPolicy: IfNotPresent
+  controller:
+    enabled: true
+    image:
+      pullPolicy: IfNotPresent
+  speaker:
+    enabled: true
+    image:
+      pullPolicy: IfNotPresent
+    frr:
+      enabled: true
+      image:
+        pullPolicy: IfNotPresent
+  crds:
+    enabled: true
