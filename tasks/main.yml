@@ -61,7 +61,7 @@
     state: "{{ item.state | default('directory') }}"
   loop:
     - { dest: /etc/kubernetes/charts }
-  when: inventory_hostname == ansible_play_hosts[0]
+  when: inventory_hostname == groups['kube_master'][0]
 
 - name: rsync directories
   ansible.posix.synchronize:
@@ -73,7 +73,7 @@
     group: false
   loop:
     - { dest: /etc/kubernetes/charts/metallb }
-  when: inventory_hostname == ansible_play_hosts[0]
+  when: inventory_hostname == groups['kube_master'][0]
 
 - name: copy templates
   ansible.builtin.template:
@@ -84,7 +84,7 @@
     mode: "{{ item.mode | default('0644') }}"
   loop:
     - { dest: /etc/kubernetes/charts/metallb.values.yaml }
-  when: inventory_hostname == ansible_play_hosts[0]
+  when: inventory_hostname == groups['kube_master'][0]
 
 - name: helm install
   kubernetes.core.helm:
@@ -93,4 +93,4 @@
     chart_ref: /etc/kubernetes/charts/metallb
     values_files: /etc/kubernetes/charts/metallb.values.yaml
     create_namespace: true
-  when: inventory_hostname == ansible_play_hosts[0]
+  when: inventory_hostname == groups['kube_master'][0]

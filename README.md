@@ -7,7 +7,7 @@
 [![GitHub license](https://img.shields.io/github/license/alvistack/ansible-role-helm_metallb.svg)](https://github.com/alvistack/ansible-role-helm_metallb/blob/master/LICENSE)
 [![Ansible Role](https://img.shields.io/badge/galaxy-alvistack.helm_metallb-blue.svg)](https://galaxy.ansible.com/alvistack/helm_metallb)
 
-Ansible Role for MetalLB with Helm Installation.
+Ansible Role for MetalLB with Helm.
 
 ## Requirements
 
