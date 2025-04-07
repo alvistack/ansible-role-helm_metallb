@@ -33,6 +33,9 @@ platforms:
       - "storage :file, bus: 'virtio', cache: 'writeback'"
     instance_raw_config_args:
       - vm.box_check_update = false
+      - "vm.provision :shell, inline: 'systemctl stop guestfs-firstboot.service || true'"
+      - "vm.provision :shell, inline: 'systemctl disable guestfs-firstboot.service || true'"
+      - "vm.provision :shell, inline: '/usr/local/bin/virt-sysprep-firstboot.sh || true'"
     groups:
       - etcd
       - kube_master

@@ -1,0 +1,3 @@
+# {{ ansible_managed }}
+
+{{ helm_metallb_helm_release_values | to_nice_yaml(indent=2) }}

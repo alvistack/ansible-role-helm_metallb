@@ -24,10 +24,10 @@ collections:
     version: ">=1.7.0,<2.0.0"
 
 roles:
-  - name: alvistack.kube_addon_manager
-    src: https://github.com/alvistack/ansible-role-kube_addon_manager
+  - name: alvistack.helm
+    src: https://github.com/alvistack/ansible-role-helm
     version: develop
 
-  - name: alvistack.kube_cilium
-    src: https://github.com/alvistack/ansible-role-kube_cilium
+  - name: alvistack.helm_cilium
+    src: https://github.com/alvistack/ansible-role-helm_cilium
     version: develop
