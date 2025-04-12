@@ -2,6 +2,7 @@
 
 ## 11.5.0 - TBC
 
+- Support Ubuntu 25.04
 - Rename prefix with `helm_`
 - Simplify with Helm
 
