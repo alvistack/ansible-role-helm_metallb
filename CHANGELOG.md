@@ -1,6 +1,8 @@
 # Ansible Role for MetalLB with Helm
 
-## 11.5.0 - TBC
+## 12.0.0 - TBC
+
+## 11.5.0 - 2025-04-23
 
 - Support Ubuntu 25.04
 - Rename prefix with `helm_`
