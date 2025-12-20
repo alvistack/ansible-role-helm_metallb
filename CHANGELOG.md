@@ -2,6 +2,8 @@
 
 ## 13.0.0 - TBC
 
+- Remove Kubernetes 1.32 support
+
 ## 12.2.0 - 2025-11-20
 
 - Support Ansible community package 12.2.0
