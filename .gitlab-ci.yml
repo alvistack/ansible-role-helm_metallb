@@ -121,6 +121,13 @@ default:
     - *script-linters
   retry: 2
 
+build:kubernetes-1.35-libvirt:
+  <<: *job-molecule-test
+  stage: build
+  variables:
+    _BOX: kubernetes-1.35
+    _PROVIDER: libvirt
+
 build:kubernetes-1.34-libvirt:
   <<: *job-molecule-test
   stage: build
@@ -135,17 +142,10 @@ build:kubernetes-1.33-libvirt:
     _BOX: kubernetes-1.33
     _PROVIDER: libvirt
 
-build:kubernetes-1.32-libvirt:
-  <<: *job-molecule-test
-  stage: build
-  variables:
-    _BOX: kubernetes-1.32
-    _PROVIDER: libvirt
-
 deploy:ansible-galaxy:
   <<: *job-ansible-galaxy-role-import
   stage: deploy
   needs:
+    - build:kubernetes-1.35-libvirt
     - build:kubernetes-1.34-libvirt
     - build:kubernetes-1.33-libvirt
-    - build:kubernetes-1.32-libvirt
