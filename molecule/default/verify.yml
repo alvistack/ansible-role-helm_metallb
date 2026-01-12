@@ -51,7 +51,7 @@
             namespace: metallb
           spec:
             addresses:
-              - "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.prefix) | ansible.utils.ipsubnet(28, -1) }}"
+              - "{{ (ansible_facts['default_ipv4'].network + '/' + ansible_facts['default_ipv4'].prefix) | ansible.utils.ipsubnet(28, -1) }}"
       when: inventory_hostname == groups['kube_master'][0]
       register: result
       changed_when: result is not succeeded
