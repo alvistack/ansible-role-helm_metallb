@@ -93,6 +93,8 @@
     chart_ref: /etc/kubernetes/charts/metallb
     values_files: /etc/kubernetes/charts/metallb.values.yaml
     create_namespace: true
+    state: present
+    wait: true
   when: inventory_hostname == groups['kube_master'][0]
   register: result
   changed_when: result is not succeeded
