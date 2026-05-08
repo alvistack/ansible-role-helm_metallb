@@ -26,18 +26,22 @@ helm_metallb_helm_release_values:
     create: true
   prometheus:
     rbacProxy:
+      repository: gcr.io/kubebuilder/kube-rbac-proxy
       pullPolicy: IfNotPresent
   controller:
     enabled: true
     image:
+      repository: quay.io/metallb/controller
       pullPolicy: IfNotPresent
   speaker:
     enabled: true
     image:
+      repository: quay.io/metallb/speaker
       pullPolicy: IfNotPresent
     frr:
       enabled: true
       image:
+        repository: quay.io/frrouting/frr
         pullPolicy: IfNotPresent
   crds:
     enabled: true
